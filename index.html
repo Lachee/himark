@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <div id="app">
+      <pre id='editor'>
+# Markdown
+This is a _test_ **suite** of ~~markdown~~
+
+[@Lachee](#/identity/8eb0)
+
+
+List Example
+- Apple
+- Mangos
+- Oranges
+
+[ ] test
+[ ] test 2
+[x] test 3
+
+    tabbed
+
+> Quote
+
+```
+codeblock
+```
+
+[Link](https://google.com)
+#issue
+      </pre>
+      <div id='preview'></div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
