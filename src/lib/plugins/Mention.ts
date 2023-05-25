@@ -1,12 +1,19 @@
 import Tribute from 'tributejs';
 import type { TributeCollection } from 'tributejs/tributejs';
 
-import type { Editor, Plugin } from '../Editor';
-import { replaceLinks } from './Link';
 import { configure, type Defaults, type Options } from '../utils/Configuration';
+import type { Editor, Plugin } from '../Editor';
+import { Key } from '../utils/Keys';
+import { replaceLinks } from './Link';
 
 import 'tributejs/dist/tribute.css';
 import './mention.css';
+
+type TributeInstance =  Tribute<any> & {
+    selectItemAtIndex(index : number, originalEvent : any) : void;
+    hideMenu() : void;
+    menuSelected : number;
+}
 
 export type Collection<T> = TributeCollection<T>;
 
@@ -19,13 +26,13 @@ export class MentionPlugin implements Plugin {
     collections: Array<Collection<any>>;
     includePrefix: boolean;
 
-    private _tribute: Tribute<any>;
+    private _tribute: TributeInstance;
 
     constructor(opts?: Options<MentionPlugin>) {
         configure(this, opts, defaultConfig);
         this._tribute = new Tribute({
             collection: this.collections
-        });
+        }) as TributeInstance;
     }
 
     get tribute() { 
@@ -39,17 +46,29 @@ export class MentionPlugin implements Plugin {
     }
 
     initialize(editor: Editor): void {
-        this._tribute.attach(editor.view.getInputField());
-
         const { view } = editor;
-        view.on('change', (_, change) => {
-            // if (change.text.length == 1) {
-            //     const prefix = this.hasPrefix(change.text[0]);
-            //     if (prefix !== false) {
-            // 
-            //     }
-            // }
+        
+        this._tribute.attach(view.getInputField());
+        view.on('keydown', (_, evt) => {
+            if (!this._tribute.isActive) return;
+            switch(evt.keyCode) {
+                default: 
+                    return;
 
+                case Key.Tab:
+                case Key.Enter:
+                    this._tribute.selectItemAtIndex(this._tribute.menuSelected, evt);
+                    evt.preventDefault();
+                    break;
+
+                case Key.UpArrow:
+                case Key.DownArrow:
+                    evt.preventDefault();
+                    break;
+            };
+        });
+
+        view.on('change', (_, change) => {
             replaceLinks(view, {
                 check: (label) => this.hasPrefix(label) !== false,
                 replace: (label, url, fullText) => {

@@ -5,7 +5,7 @@ import './main.css';
 import { CheckboxPlugin, MentionPlugin } from './lib/plugins';
 
 async function search(text): Promise<Array<User>> {
-    await new Promise<void>((resolve) => setTimeout(() => resolve(), 5));
+    console.log('search', text);
     return [
         { id: "1e67", name: "Lake", avatar: "e" },
         { id: "9632", name: "Bilbo Swaggings", avatar: "e" },
@@ -25,6 +25,7 @@ const userCollection : Collection<User> = {
     trigger: '@',
     lookup: 'name',
     fillAttr: 'name',
+    allowSpaces: true,
     selectTemplate: ({ original }) => `[@${original.name}](#/identity/${original.id})`,
     values: (text, cb) => search(text).then(result => cb(result))
 };
