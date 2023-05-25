@@ -94,6 +94,7 @@ export class MentionPlugin implements Plugin {
                     linkElement.target = '_BLANK';
                     linkElement.title = label;
                     linkElement.setAttribute('data-href', url);
+                    linkElement.classList.add('cm-mention');
                     return linkElement;
                 },
             });
