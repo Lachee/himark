@@ -25,6 +25,7 @@ export interface EditorConfiguration {
     value?: string;
     placeholder: string;
     autofocus: boolean;
+    wrap: boolean;
 }
 
 export const defaultConfig: Defaults<EditorConfiguration> = {
@@ -33,6 +34,7 @@ export const defaultConfig: Defaults<EditorConfiguration> = {
     lineNumbers: false,
     placeholder: '',
     autofocus: false,
+    wrap: true,
     plugins: [
         new CheckboxPlugin()
     ],
@@ -55,6 +57,7 @@ export class Editor {
             lineNumbers: configuration.lineNumbers,
             placeholder: configuration.placeholder,
             autofocus: configuration.autofocus,
+            lineWrapping: configuration.wrap,
         });
         
         // @ts-ignore
