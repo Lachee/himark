@@ -1,12 +1,12 @@
-import CodeMirror from 'codemirror';
+import CodeMirror, { defaults } from 'codemirror';
 import './Editor.css';
 
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import 'codemirror/mode/gfm/gfm';
 
-import { ExampleLinkPlugin } from './plugins/Link';
-import { CheckboxPlugin } from './plugins/Checkbox';
+import { CheckboxPlugin, MentionPlugin } from './plugins';
+import { type Defaults, type Options, configure, configureNew } from './utils/Configuration';
 
 export type EditorEventMap = CodeMirror.EditorEventMap;
 
@@ -14,78 +14,80 @@ export interface Plugin {
     initialize: (editor : Editor) => void;
 };
 
-export interface Config {
+export interface EditorConfig {
     mode : 'markdown'|'gfm';
     theme : string;
     lineNumbers : boolean;
     plugins : Plugin[];
+    value? : string;
 }
 
-export const defaultConfig : Config = {
-    mode: 'gfm',
-    theme: 'default',
-    lineNumbers: false,
-    plugins: [
-        new ExampleLinkPlugin(),
-        new CheckboxPlugin(false)
-    ]
+export const defaultConfig : Defaults<EditorConfig> = {
+    mode:           'gfm',
+    theme:          'default',
+    lineNumbers:    false,
+    plugins:        [
+        new CheckboxPlugin()
+    ],
 };
 
 export class Editor {
 
-    view : CodeMirror.Editor;
-    config : Config;
-    plugins : Plugin[];
+    private _view : CodeMirror.Editor;    
+    private _plugins : Plugin[];
 
-    constructor(element : HTMLElement, config? : Partial<Config>) {
-        if (config === undefined) config = {};
-        this.config = Object.assign(defaultConfig, config);
+    constructor(element : HTMLElement, opts? : Options<EditorConfig>) {
+        const configuration = configureNew(opts, defaultConfig);
 
-        const defaultValue = element.innerText;
+        const defaultValue = configuration.value ?? element.innerText;
         element.innerHTML = '';
 
-        this.view = CodeMirror(element, {
-            mode:           this.config.mode === 'gfm' ? 'gfm' : 'markdown',    // While TS will enforce this, JS wont.
-            theme:          this.config.theme,
-            lineNumbers:    this.config.lineNumbers,
+        this._view = CodeMirror(element, {
+            mode:           configuration.mode === 'gfm' ? 'gfm' : 'markdown',    // While TS will enforce this, JS wont.
+            theme:          configuration.theme,
+            lineNumbers:    configuration.lineNumbers,
             autofocus:      true,
         });
 
-        this.plugins = [];
-        for(const plugin of this.config.plugins) {
+        this._plugins = [];
+        for(const plugin of configuration.plugins) {
             this.registerPlugin(plugin);
         }
         
         this.value = defaultValue;
     }
 
+    get view() {
+        return this._view;
+    }
+
     registerPlugin(plugin : Plugin) {
-        this.plugins.push(plugin);
+        this._plugins.push(plugin);
         plugin.initialize(this);
     }
 
     get value() : string {
-        return this.view.getValue();
+        return this._view.getValue();
     }
 
     set value(markdown : string) {
-        this.view.setValue(markdown);
+        this._view.setValue(markdown);
     }
 
     on<T extends keyof EditorEventMap>(eventName: T, handler: EditorEventMap[T]): void {
-        this.view.on(eventName, handler);
+        this._view.on(eventName, handler);
     }
 
     off<T extends keyof EditorEventMap>(eventName: T, handler: EditorEventMap[T]): void {
-        this.view.off(eventName, handler);
+        this._view.off(eventName, handler);
     }
 
     once<T extends keyof EditorEventMap>(eventName: T, handler: EditorEventMap[T]): void {
         const wrappedHandler = (...args) => {
-            this.view.off(eventName, wrappedHandler);
+            this._view.off(eventName, wrappedHandler);
             //@ts-ignore
             handler(args);
         };
-        this.view.on(eventName, wrappedHandler);
+        this._view.on(eventName, wrappedHandler);
     }
 }

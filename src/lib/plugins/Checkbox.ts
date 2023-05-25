@@ -1,12 +1,21 @@
 import CodeMirror from 'codemirror';
-import type { Editor, Plugin }from '../Editor';
+import type { Editor, Plugin } from '../Editor';
+import { configure, type Defaults, type Options } from '../utils/Configuration';
 
 const NewLinePattern = /^\[([xX ])\]\s\w/g;
 const AnyPattern = /\[([xX ])\]\s\w/g;
 
+export const defaultConfig : Defaults<CheckboxPlugin> = {
+    allowSameLine: false
+}
+
 export class CheckboxPlugin implements Plugin 
 {
-    constructor(readonly allowSameLine : boolean) {}
+    allowSameLine : boolean;
+
+    constructor(opts? : Options<CheckboxPlugin>) {
+        configure(this, opts, defaultConfig);
+    }
 
     initialize(editor : Editor) {
         const { view } = editor;

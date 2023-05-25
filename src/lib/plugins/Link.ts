@@ -14,9 +14,6 @@ export interface ReplaceOptions {
 
 /** A really basic and dumb link plugin example */
 export class ExampleLinkPlugin implements Plugin {
-
-    requireCtrlClick : boolean = true;
-
     initialize(editor: Editor): void {
         const { view } = editor;
         view.on('change', () => {

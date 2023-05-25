@@ -23,7 +23,8 @@
     }
   },
   "dependencies": {
-    "codemirror": "^5.65.13"
+    "codemirror": "^5.65.13",
+    "tributejs": "^5.1.3"
   },
   "devDependencies": {
     "@types/codemirror": "^5.60.7",
