@@ -8,8 +8,7 @@
   </head>
   <body>
     <div id="app">
-      <pre id='editor'>
-# Markdown
+      <div class='editor' style='white-space: pre;'># Markdown
 This is a _test_ **suite** of ~~markdown~~
 
 [@Lachee](#/identity/8eb0)
@@ -24,7 +23,7 @@ List Example
 [ ] test 2
 [x] test 3
 
-    tabbed
+tabbed
 
 > Quote
 
@@ -34,8 +33,9 @@ codeblock
 
 [Link](https://google.com)
 #issue
-      </pre>
-      <div id='preview'></div>
+      </div>
+      <div class='markdown'></div>
+      <div class='preview'></div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

@@ -5,28 +5,37 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/markdown/markdown';
 import 'codemirror/mode/gfm/gfm';
 
-import { linkPlugin } from './plugins/Link';
-import { checkboxPlugin } from './plugins/Checkbox';
+import { ExampleLinkPlugin } from './plugins/Link';
+import { CheckboxPlugin } from './plugins/Checkbox';
 
-const defer = setTimeout;
 export type EditorEventMap = CodeMirror.EditorEventMap;
+
+export interface Plugin {
+    initialize: (editor : Editor) => void;
+};
 
 export interface Config {
     mode : 'markdown'|'gfm';
     theme : string;
     lineNumbers : boolean;
+    plugins : Plugin[];
 }
 
 export const defaultConfig : Config = {
     mode: 'gfm',
     theme: 'default',
     lineNumbers: false,
+    plugins: [
+        new ExampleLinkPlugin(),
+        new CheckboxPlugin(false)
+    ]
 };
 
 export default class Editor {
-    view : CodeMirror.Editor;
 
+    view : CodeMirror.Editor;
     config : Config;
+    plugins : Plugin[];
 
     constructor(element : HTMLElement, config? : Partial<Config>) {
         if (config === undefined) config = {};
@@ -42,13 +51,17 @@ export default class Editor {
             autofocus:      true,
         });
 
-        this.registerPlugins();
+        this.plugins = [];
+        for(const plugin of this.config.plugins) {
+            this.registerPlugin(plugin);
+        }
+        
         this.value = defaultValue;
     }
 
-    private registerPlugins() {
-        linkPlugin(this.view);
-        checkboxPlugin(this.view);
+    registerPlugin(plugin : Plugin) {
+        this.plugins.push(plugin);
+        plugin.initialize(this);
     }
 
     get value() : string {

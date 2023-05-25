@@ -1,9 +1,8 @@
 import CodeMirror from 'codemirror';
+import type { default as Editor, Plugin } from '../Editor';
 
-type Editor = CodeMirror.Editor;
-
-export type ReplaceCallback = (label : string, url : string) => HTMLElement|string;
-export type CheckCallback = (line : string, label : string, url : string) => boolean;
+export type ReplaceCallback = (label : string, url : string, fullText : string) => HTMLElement|string;
+export type CheckCallback = (label : string, url : string, fullText : string) => boolean;
 
 export interface ReplaceOptions {
     replace : ReplaceCallback;
@@ -13,46 +12,53 @@ export interface ReplaceOptions {
     classList? : string[];
 }
 
+/** A really basic and dumb link plugin example */
+export class ExampleLinkPlugin implements Plugin {
 
-export function linkPlugin(editor: Editor): void {
-    editor.on('change', () => {
-        replaceLinks(editor, (label, url) => {
-            const linkElement = document.createElement('a');
-            linkElement.textContent = label;
-            linkElement.href = '#';            
-            linkElement.setAttribute('data-href', url);
-            return linkElement;
+    requireCtrlClick : boolean = true;
+
+    initialize(editor: Editor): void {
+        const { view } = editor;
+        view.on('change', () => {
+            replaceLinks(view, (label, url, fullText) => {
+                const linkElement = document.createElement('a');
+                linkElement.textContent = fullText;
+                linkElement.href        = url;
+                linkElement.target      = '_BLANK';
+                linkElement.title       = label;
+                linkElement.setAttribute('data-href', url);
+                return linkElement;
+            });
         });
-    });
+    }
 }
 
 /**
- * 
- * @param editor The CodeMirror editor
+ * Replaces all the markdown links with the given options
+ * @param view The CodeMirror editor
  * @param replace Function that returns either a HTML element to replace it or the contents of the element.
  */
-export function replaceLinks(editor : Editor, opts : ReplaceCallback|ReplaceOptions): void {
-    const config = typeof opts !== 'function' ? opts : { 
+export function replaceLinks(view : CodeMirror.Editor, opts : ReplaceCallback|ReplaceOptions): void {
+    const config = typeof opts !== 'function' ? opts : {    // Default Options
         replace: opts,
         html: false,
     };
     
     const pattern = config.pattern ?? /\[([^\]]+)\]\(([^\)]+)\)/g;
-
-    editor.eachLine(line => {
-        const lineText = line.text;
+    view.eachLine(lineHandle => {
+        const lineText = lineHandle.text;
         let match;
         while ((match = pattern.exec(lineText)) !== null) {
             const start = match.index;
             const end = start + match[0].length;
 
             // Abort because we failed check
-            if (config.check && !config.check(match[0], match[1], match[2]))
+            if (config.check && !config.check(match[1], match[2], match[0]))
                 continue;
     
             // Invoke the replace function and get hte most appropriate element for it
             let replacedWith : HTMLElement;
-            const replaceResults = config.replace(match[1], match[2]);
+            const replaceResults = config.replace(match[1], match[2], match[0]);
             if (replaceResults instanceof HTMLElement) {
                 replacedWith = replaceResults;
             } else {
@@ -72,10 +78,10 @@ export function replaceLinks(editor : Editor, opts : ReplaceCallback|ReplaceOpti
                 }
             }
 
-            const ln = editor.getLineNumber(line);
-            editor.markText(
-                { line: ln, ch: start },
-                { line: ln, ch: end },
+            const line = view.getLineNumber(lineHandle);
+            view.markText(
+                { line, ch: start },
+                { line, ch: end },
                 { replacedWith }
             );
         }

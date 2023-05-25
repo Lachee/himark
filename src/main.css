@@ -5,8 +5,6 @@ body {
     margin: 0;
 }
 
-  
-  
 #app {
     --spacing: 10px;
     display: flex;
@@ -15,17 +13,32 @@ body {
     height: 100%;
     position: relative;
     
+    font-family:Arial, Helvetica, sans-serif;
 }
-#editor {
-    border-right: 1px solid black;
-    padding-right: var(--spacing);
-    flex: 1;
-}
+
 .CodeMirror {
     height: 100% !important;
 }
 
-#preview {
-    padding-left: var(--spacing);
+#app > div {
     flex: 1;
+    padding-right: var(--spacing);
+    padding-left: var(--spacing);
+    border-left: 1px solid black;
 }
+#app > div:first-child {
+    padding-left: 0;
+    border-left: none;
+}
+#app > div:last-child {
+    padding-right: 0;
+    border-right: none;
+}
+
+#app .editor * {                
+    font-family:Arial, Helvetica, sans-serif;
+}
+#app .markdown {
+    font-family: 'Courier New', Courier, monospace;
+}
+#app .preview {}

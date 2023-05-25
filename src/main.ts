@@ -8,17 +8,17 @@ const toHTML = (markdown : string) =>  Marked.marked(markdown, { headerIds: fals
 // import viteLogo from '/vite.svg'
 // import { setupCounter } from './counter.ts'
 
-const elmEditor = document.getElementById('editor');
-const elmPreview = document.getElementById('preview');
+const elmEditor   = document.querySelector<HTMLElement>('.editor');
+const elmPreview  = document.querySelector<HTMLElement>('.preview');
+const elmMarkdown = document.querySelector<HTMLElement>('.markdown');
 
 const editor = new Editor(elmEditor);
-if (elmPreview) {
-    editor.on('change', () => {
-        const markdown = editor.value;
-        elmPreview.innerHTML = toHTML(markdown);
-    });
+editor.on('change', () => {
+    const markdown = editor.value;
+    elmMarkdown.innerText = markdown;
+    elmPreview.innerHTML = Marked.marked(markdown, { mangle: false, headerIds: false });
+});
 
-    // Force a trigger
-    editor.value = editor.value;
-}
-
+// Late update it so we can trigger all our events
+editor.value = editor.value;
+console.log('Editor Ready', editor);
