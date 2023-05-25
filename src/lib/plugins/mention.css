@@ -1,0 +1,4 @@
+.tribute-container {
+    top: var(--tribute-container-top);
+    left: var(--tribute-container-left);
+}

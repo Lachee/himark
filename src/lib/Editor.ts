@@ -1,7 +1,10 @@
 import CodeMirror, { defaults } from 'codemirror';
+import 'codemirror/addon/display/placeholder';
+
 import './Editor.css';
 
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/ttcn.css';
 import 'codemirror/mode/markdown/markdown';
 import 'codemirror/mode/gfm/gfm';
 
@@ -20,12 +23,16 @@ export interface EditorConfiguration {
     lineNumbers: boolean;
     plugins: Plugin[];
     value?: string;
+    placeholder: string;
+    autofocus: boolean;
 }
 
 export const defaultConfig: Defaults<EditorConfiguration> = {
     mode: 'gfm',
-    theme: 'default',
+    theme: 'ttcn',
     lineNumbers: false,
+    placeholder: '',
+    autofocus: false,
     plugins: [
         new CheckboxPlugin()
     ],
@@ -46,9 +53,11 @@ export class Editor {
             mode: configuration.mode === 'gfm' ? 'gfm' : 'markdown',    // While TS will enforce this, JS wont.
             theme: configuration.theme,
             lineNumbers: configuration.lineNumbers,
-            autofocus: true,
+            placeholder: configuration.placeholder,
+            autofocus: configuration.autofocus,
         });
-
+        
+        // @ts-ignore
         this._plugins = [];
         for (const plugin of configuration.plugins) {
             this.registerPlugin(plugin);

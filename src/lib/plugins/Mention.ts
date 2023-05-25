@@ -9,7 +9,7 @@ import { replaceLinks } from './Link';
 import 'tributejs/dist/tribute.css';
 import './mention.css';
 
-type TributeInstance =  Tribute<any> & {
+type TributeType =  Tribute<any> & {
     selectItemAtIndex(index : number, originalEvent : any) : void;
     hideMenu() : void;
     menuSelected : number;
@@ -26,13 +26,18 @@ export class MentionPlugin implements Plugin {
     collections: Array<Collection<any>>;
     includePrefix: boolean;
 
-    private _tribute: TributeInstance;
+    private _tribute: TributeType;
 
     constructor(opts?: Options<MentionPlugin>) {
         configure(this, opts, defaultConfig);
         this._tribute = new Tribute({
+            menuContainer: document.body,
+            positionMenu: false,
             collection: this.collections
-        }) as TributeInstance;
+        }) as TributeType;
+
+        //@ts-ignore bodge that will stop shift hiding names
+        this._tribute.events.shouldDeactivate = (evt) => false;
     }
 
     get tribute() { 
@@ -47,7 +52,8 @@ export class MentionPlugin implements Plugin {
 
     initialize(editor: Editor): void {
         const { view } = editor;
-        
+
+
         this._tribute.attach(view.getInputField());
         view.on('keydown', (_, evt) => {
             if (!this._tribute.isActive) return;
@@ -66,6 +72,16 @@ export class MentionPlugin implements Plugin {
                     evt.preventDefault();
                     break;
             };
+        });
+
+        view.on('cursorActivity', (_) => {
+            const coords = view.cursorCoords();
+            if (coords.left == 0 || coords.top == 0)
+                return;
+
+            console.log('setting container', coords);
+            document.body.style.setProperty('--tribute-container-top', `calc(${coords.top}px + 1em)`);
+            document.body.style.setProperty('--tribute-container-left', `${coords.left}px`);
         });
 
         view.on('change', (_, change) => {
