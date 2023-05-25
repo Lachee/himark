@@ -1,7 +1,7 @@
 {
-  "name": "discuss-md",
+  "name": "himark",
   "version": "1.0.0",
-  "description": "MarkDown editor for discussion based applications",
+  "description": "Markdown editor for discussion based applications",
   "keywords": [],
   "author": "Lachee",
   "license": "MIT",
@@ -11,15 +11,15 @@
     "preview": "vite preview"
   },
   "type": "module",
-  "module": "./dist/discuss-md.es.js",
-  "main": "./dist/discuss-md.umd.js",
+  "module": "./dist/himark-md.es.js",
+  "main": "./dist/himark-md.umd.js",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "import": "./dist/discuss-md.js",
-      "require": "./dist/discuss-md.umd.cjs"
+      "import": "./dist/himark-md.es.js",
+      "require": "./dist/himark-md.umd.cjs"
     }
   },
   "dependencies": {

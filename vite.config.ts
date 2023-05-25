@@ -1,7 +1,7 @@
 import { resolve } from 'path';
 import { defineConfig } from 'vite';
 
-const minify = true;
+const browsify = true;
 
 export default defineConfig({
     css: {
@@ -10,15 +10,15 @@ export default defineConfig({
         },
     },
     build: {
-        minify: minify,
+        minify: browsify,
         sourcemap: true,
         lib: {
             // Could also be a dictionary or array of multiple entry points
             entry: resolve(__dirname, 'src/lib/Editor.ts'),
-            name: 'DiscussMD',
+            name: 'HiMark',
             // the proper extensions will be added
-            fileName: (format) => `discuss-md` + (minify ? '.min.js' : '.js'),
-            formats: [ 'iife' ],
+            fileName: (format) => `himark-md.${browsify ? 'min' : format}.js`,
+            formats: browsify ? [ 'iife' ] : [ 'es', 'umd' ],
         },
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
