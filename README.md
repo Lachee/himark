@@ -16,6 +16,8 @@
     </tr>
 </table>
 
+<img src="https://raw.githubusercontent.com/Lachee/himark/master/resources/preview.gif" align="center" width="100%" />
+
 # Usage
 
 Usage is not yet documented, but here is a very basic browser usage to get you started:
@@ -49,3 +51,4 @@ This example users the `/search` endpoint which returns a SELECT2 response.
 </script>
 ```
 yes, it uses jquery... it's just an example and could easily be replaced with `fetch`.
+
