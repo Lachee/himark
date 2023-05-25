@@ -31,7 +31,7 @@ export const defaultConfig : Config = {
     ]
 };
 
-export default class Editor {
+export class Editor {
 
     view : CodeMirror.Editor;
     config : Config;

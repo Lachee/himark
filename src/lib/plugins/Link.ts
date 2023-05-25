@@ -1,5 +1,5 @@
 import CodeMirror from 'codemirror';
-import type { default as Editor, Plugin } from '../Editor';
+import type { Editor, Plugin } from '../Editor';
 
 export type ReplaceCallback = (label : string, url : string, fullText : string) => HTMLElement|string;
 export type CheckCallback = (label : string, url : string, fullText : string) => boolean;

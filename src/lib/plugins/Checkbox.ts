@@ -1,5 +1,5 @@
 import CodeMirror from 'codemirror';
-import type { default as Editor, Plugin }from '../Editor';
+import type { Editor, Plugin }from '../Editor';
 
 const NewLinePattern = /^\[([xX ])\]\s\w/g;
 const AnyPattern = /\[([xX ])\]\s\w/g;

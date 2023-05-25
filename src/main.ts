@@ -1,4 +1,4 @@
-import Editor from './lib/Editor';
+import { Editor } from './lib/Editor';
 import './main.css';
 
 import * as Marked from 'marked';

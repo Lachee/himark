@@ -14,7 +14,7 @@ export default defineConfig({
         sourcemap: true,
         lib: {
             // Could also be a dictionary or array of multiple entry points
-            entry: resolve(__dirname, 'src/lib/Editor.ts'),
+            entry: resolve(__dirname, 'src/lib/index.ts'),
             name: 'HiMark',
             // the proper extensions will be added
             fileName: (format) => `himark-md.${browsify ? 'min' : format}.js`,
