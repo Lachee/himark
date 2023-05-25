@@ -11,49 +11,49 @@ import { type Defaults, type Options, configure, configureNew } from './utils/Co
 export type EditorEventMap = CodeMirror.EditorEventMap;
 
 export interface Plugin {
-    initialize: (editor : Editor) => void;
+    initialize: (editor: Editor) => void;
 };
 
 export interface EditorConfiguration {
-    mode : 'markdown'|'gfm';
-    theme : string;
-    lineNumbers : boolean;
-    plugins : Plugin[];
-    value? : string;
+    mode: 'markdown' | 'gfm';
+    theme: string;
+    lineNumbers: boolean;
+    plugins: Plugin[];
+    value?: string;
 }
 
-export const defaultConfig : Defaults<EditorConfiguration> = {
-    mode:           'gfm',
-    theme:          'default',
-    lineNumbers:    false,
-    plugins:        [
+export const defaultConfig: Defaults<EditorConfiguration> = {
+    mode: 'gfm',
+    theme: 'default',
+    lineNumbers: false,
+    plugins: [
         new CheckboxPlugin()
     ],
 };
 
 export class Editor {
 
-    private _view : CodeMirror.Editor;    
-    private _plugins : Plugin[];
+    private _view: CodeMirror.Editor;
+    private _plugins: Plugin[];
 
-    constructor(element : HTMLElement, opts? : Options<EditorConfiguration>) {
+    constructor(element: HTMLElement, opts?: Options<EditorConfiguration>) {
         const configuration = configureNew(opts, defaultConfig);
 
         const defaultValue = configuration.value ?? element.innerText;
         element.innerHTML = '';
 
         this._view = CodeMirror(element, {
-            mode:           configuration.mode === 'gfm' ? 'gfm' : 'markdown',    // While TS will enforce this, JS wont.
-            theme:          configuration.theme,
-            lineNumbers:    configuration.lineNumbers,
-            autofocus:      true,
+            mode: configuration.mode === 'gfm' ? 'gfm' : 'markdown',    // While TS will enforce this, JS wont.
+            theme: configuration.theme,
+            lineNumbers: configuration.lineNumbers,
+            autofocus: true,
         });
 
         this._plugins = [];
-        for(const plugin of configuration.plugins) {
+        for (const plugin of configuration.plugins) {
             this.registerPlugin(plugin);
         }
-        
+
         this.value = defaultValue;
     }
 
@@ -61,17 +61,17 @@ export class Editor {
         return this._view;
     }
 
-    registerPlugin(plugin : Plugin) {
-        this._plugins.push(plugin);
-        plugin.initialize(this);
-    }
-
-    get value() : string {
+    get value(): string {
         return this._view.getValue();
     }
 
-    set value(markdown : string) {
+    set value(markdown: string) {
         this._view.setValue(markdown);
+    }
+
+    registerPlugin(plugin: Plugin) {
+        this._plugins.push(plugin);
+        plugin.initialize(this);
     }
 
     on<T extends keyof EditorEventMap>(eventName: T, handler: EditorEventMap[T]): void {
