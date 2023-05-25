@@ -14,7 +14,7 @@ export interface Plugin {
     initialize: (editor : Editor) => void;
 };
 
-export interface EditorConfig {
+export interface EditorConfiguration {
     mode : 'markdown'|'gfm';
     theme : string;
     lineNumbers : boolean;
@@ -22,7 +22,7 @@ export interface EditorConfig {
     value? : string;
 }
 
-export const defaultConfig : Defaults<EditorConfig> = {
+export const defaultConfig : Defaults<EditorConfiguration> = {
     mode:           'gfm',
     theme:          'default',
     lineNumbers:    false,
@@ -36,7 +36,7 @@ export class Editor {
     private _view : CodeMirror.Editor;    
     private _plugins : Plugin[];
 
-    constructor(element : HTMLElement, opts? : Options<EditorConfig>) {
+    constructor(element : HTMLElement, opts? : Options<EditorConfiguration>) {
         const configuration = configureNew(opts, defaultConfig);
 
         const defaultValue = configuration.value ?? element.innerText;

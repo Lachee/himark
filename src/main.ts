@@ -1,9 +1,10 @@
 import * as Marked from 'marked';
-import { Editor } from './lib/Editor';
+import { Editor, EditorConfiguration } from './lib/Editor';
 import { Collection } from './lib/plugins/Mention';
 import './main.css';
+import { CheckboxPlugin, MentionPlugin } from './lib/plugins';
 
-async function search(text): Promise<Array<TUser>> {
+async function search(text): Promise<Array<User>> {
     await new Promise<void>((resolve) => setTimeout(() => resolve(), 5));
     return [
         { id: "1e67", name: "Lake", avatar: "e" },
@@ -14,28 +15,42 @@ async function search(text): Promise<Array<TUser>> {
     ]
 }
 
-interface TUser {
+interface User {
     id: string;
     name: string;
     avatar: string;
 }
 
-const UserCollection =  {
+const userCollection : Collection<User> = {
     trigger: '@',
     lookup: 'name',
     fillAttr: 'name',
+    selectTemplate: ({ original }) => `[@${original.name}](#/identity/${original.id})`,
+    values: (text, cb) => search(text).then(result => cb(result))
+};
 
-    values: (text, cb) => {
-        search(text).then(result => cb(result));
-    }
-} satisfies Collection<TUser>
-
-function createEditor() {
-        
+function createEditor() {        
     const elmEditor   = document.querySelector<HTMLElement>('.editor');
     const elmPreview  = document.querySelector<HTMLElement>('.preview');
     const elmMarkdown = document.querySelector<HTMLElement>('.markdown');
-    const editor = new Editor(elmEditor, config);
+    const editor = new Editor(elmEditor, {
+        plugins: [
+            new MentionPlugin({
+                collections: [ 
+                    userCollection,
+                    {   // Example of a inline collection
+                        trigger: '#',
+                        lookup: 'name',
+                        fillAttr: 'name',
+                        values: (text, cb) => {
+                            search(text).then(result => cb(result));
+                        }
+                    } satisfies Collection<User>
+                ]
+            }),
+            new CheckboxPlugin()
+        ]
+    });
 
     editor.on('change', () => {
         const markdown = editor.value;
@@ -47,3 +62,5 @@ function createEditor() {
     editor.value = editor.value;
     console.log('Editor Ready', editor);
 }
+
+createEditor();
