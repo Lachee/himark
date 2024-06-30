@@ -27,7 +27,8 @@ const userCollection : Collection<User> = {
     fillAttr: 'name',
     allowSpaces: true,
     selectTemplate: ({ original }) => `[@${original.name}](#/identity/${original.id})`,
-    values: (text, cb) => search(text).then(result => cb(result))
+    values: (text, cb) => search(text).then(result => cb(result)),
+    replace: (label, url) => `<span style="padding: 3px; background: #e2e2e2;">${label}</span>`
 };
 
 function createEditor() {        
@@ -45,7 +46,7 @@ function createEditor() {
                         fillAttr: 'name',
                         values: (text, cb) => {
                             search(text).then(result => cb(result));
-                        }
+                        },
                     } satisfies Collection<User>
                 ]
             }),

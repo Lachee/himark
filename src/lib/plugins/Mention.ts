@@ -1,5 +1,5 @@
 import Tribute from 'tributejs';
-import type { TributeCollection } from 'tributejs/tributejs';
+import type { TributeCollection, TributeItem } from 'tributejs/tributejs';
 
 import { configure, type Defaults, type Options } from '../utils/Configuration';
 import type { Editor, Plugin } from '../Editor';
@@ -15,7 +15,9 @@ type TributeType =  Tribute<any> & {
     menuSelected : number;
 }
 
-export type Collection<T> = TributeCollection<T>;
+export type Collection<T> = TributeCollection<T> & {
+    replace? : (label : string, url : string) => string;
+}
 
 export const defaultConfig: Defaults<MentionPlugin> = {
     includePrefix: false,
@@ -23,7 +25,7 @@ export const defaultConfig: Defaults<MentionPlugin> = {
 }
 
 export class MentionPlugin implements Plugin {
-    collections: Array<Collection<any>>;
+    collections: Collection<any>[];
     includePrefix: boolean;
 
     private _tribute: TributeType;
@@ -79,7 +81,6 @@ export class MentionPlugin implements Plugin {
             if (coords.left == 0 || coords.top == 0)
                 return;
 
-            console.log('setting container', coords);
             document.body.style.setProperty('--tribute-container-top', `calc(${coords.top}px + 1em)`);
             document.body.style.setProperty('--tribute-container-left', `${coords.left}px`);
         });
@@ -95,6 +96,17 @@ export class MentionPlugin implements Plugin {
                     linkElement.title = label;
                     linkElement.setAttribute('data-href', url);
                     linkElement.classList.add('cm-mention');
+
+                    try {
+                        const collection = this.getCollection(label);
+                        if (collection.replace) { 
+                            const content = collection.replace(label, url);
+                            if (content != undefined) 
+                                linkElement.innerHTML = content; 
+                        }
+                    }catch(e) {
+                        console.error('failed to replace html', e);
+                    }
                     return linkElement;
                 },
             });
@@ -107,7 +119,7 @@ export class MentionPlugin implements Plugin {
         return collection ? collection.trigger : false;
     }
 
-    private getCollection<T>(text: string): Collection<T> | undefined {
+    private getCollection<T = any>(text: string): Collection<T> | undefined {
         const matches = this.collections.filter(collection => text.startsWith(collection.trigger));
         if (matches.length == 0) return undefined;
         return matches[0] as T;
